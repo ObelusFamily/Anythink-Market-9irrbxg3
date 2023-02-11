@@ -8,6 +8,7 @@ import Item from "./Item";
 import Editor from "./Editor";
 import Home from "./Home";
 import Login from "./Login";
+import PrivateRoute from "./PrivateRoute";
 import Profile from "./Profile";
 import ProfileFavorites from "./ProfileFavorites";
 import Register from "./Register";
@@ -63,7 +64,7 @@ class App extends React.Component {
             <Route path="/editor/:slug" component={Editor} />
             <Route path="/editor" component={Editor} />
             <Route path="/item/:id" component={Item} />
-            <Route path="/settings" component={Settings} />
+            <PrivateRoute path="/settings" component={Settings} currentUser={this.props.currentUser} />
             <Route path="/@:username/favorites" component={ProfileFavorites} />
             <Route path="/@:username" component={Profile} />
           </Switch>
