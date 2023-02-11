@@ -61,7 +61,7 @@ class App extends React.Component {
             <Route exact path="/" component={Home} />
             <Route path="/login" component={Login} />
             <Route path="/register" component={Register} />
-            <Route path="/editor/:slug" component={Editor} />
+            <PrivateRoute path="/editor/:slug" component={Editor} currentUser={this.props.currentUser} />
             <Route path="/editor" component={Editor} />
             <Route path="/item/:id" component={Item} />
             <PrivateRoute path="/settings" component={Settings} currentUser={this.props.currentUser} />
