@@ -21,7 +21,7 @@ spec:
         - args:
             - sh
             - -c
-            - "poetry run uvicorn --host=0.0.0.0 --port={{ .Values.backend.containerPort }} app.main:app"
+            - "poetry run newrelic-admin run-program uvicorn --host=0.0.0.0 --port={{ .Values.backend.containerPort }} app.main:app"
           env:
             - name: APP_ENV
               value: dev
@@ -31,6 +31,8 @@ spec:
               value: "True"
             - name: DATABASE_URL
               value: "{{ .Values.database.connectionProtocol }}{{ .Values.database.env.password }}:@{{ .Values.database.serviceName }}:{{ .Values.database.servicePort }}/{{ .Values.database.databaseName }}"
+            - name: NEW_RELIC_CONFIG_FILE
+              value: newrelic.ini
           image: "{{ include "anythink-tenant.backendRepository" .}}:{{ .Values.backend.image.tag }}"
           imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
           name: {{ .Values.backend.serviceName }}
