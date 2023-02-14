@@ -31,15 +31,15 @@ async def main():
 
     for _ in range(100):
         user = await users_repo.create_user(
-            username=fake.user_name(),
-            email=fake.email(),
+            username=fake.unique.user_name(),
+            email=fake.unique.email(),
             password=fake.password(),
         )
         print(f"Created USer: {user}")
         for _ in range(1):
             title = fake.text(50)
             item = await items_repo.create_item(
-                slug=fake.slug(title),
+                slug=fake.unique.slug(title),
                 title=title,
                 description=fake.sentence(50),
                 seller=user,
