@@ -1,7 +1,7 @@
 from typing import List, Optional, Sequence, Union
 
 from asyncpg import Connection, Record
-from pypika import Query, Order, functions
+from pypika import Query, Order
 
 from app.db.errors import EntityDoesNotExist
 from app.db.queries.queries import queries
@@ -18,8 +18,6 @@ from app.db.repositories.profiles import ProfilesRepository
 from app.db.repositories.tags import TagsRepository
 from app.models.domain.items import Item
 from app.models.domain.users import User
-from app.models.domain.profiles import Profile
-
 
 SELLER_USERNAME_ALIAS = "seller_username"
 SLUG_ALIAS = "slug"
@@ -218,69 +216,9 @@ class ItemsRepository(BaseRepository):  # noqa: WPS214
 
         items_rows = await self.connection.fetch(query.get_sql(), *query_params)
 
-        # fmt: off
-        query = Query.from_(
-            items,
-        ).select(
-            items.id,
-            items.slug,
-            items.title,
-            items.description,
-            items.body,
-            items.image,
-            items.created_at,
-            items.updated_at,
-            Query.from_(
-                favorites
-            ).where(
-                items.id == favorites.item_id
-            ).select(
-                functions.Count(favorites.user_id)
-            ).as_("favorites_count"),
-        ).left_join(
-            users
-        ).on(
-            users.id == items.seller_id,
-        ).select(
-            users.username,
-            users.bio,
-            users.image.as_("user_image"),
-        ).left_join(
-            favorites
-        ).on(
-            items.id == favorites.item_id,
-        ).where(
-            items.id.isin([item_row["id"] for item_row in items_rows])
-        )
-        # fmt: on
-
-        full_items_rows = await self.connection.fetch(query.get_sql())
-
         return [
-            Item(
-                id_=item_row["id"],
-                slug=item_row["slug"],
-                title=item_row["title"],
-                description=item_row["description"],
-                body=item_row["body"],
-                image=item_row["image"],
-                seller=Profile(
-                    username=item_row["username"],
-                    bio=item_row["bio"],
-                    image=item_row["user_image"],
-                ),
-                tags=await self.get_tags_for_item_by_slug(slug=item_row["slug"]),
-                favorites_count=item_row["favorites_count"],
-                favorited=await self.is_item_favorited_by_user(
-                    slug=item_row["slug"],
-                    user=requested_user,
-                )
-                if requested_user
-                else False,
-                created_at=item_row["created_at"],
-                updated_at=item_row["updated_at"],
-             )
-            for item_row in full_items_rows
+            await self.get_item_by_slug(slug=item_row['slug'], requested_user=requested_user)
+            for item_row in items_rows
         ]
 
     async def get_items_for_user_feed(
