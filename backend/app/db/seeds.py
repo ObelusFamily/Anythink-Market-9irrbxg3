@@ -29,29 +29,15 @@ async def main():
     items_repo = ItemsRepository(conn)
     comments_repo = CommentsRepository(conn)
 
+    item = await items_repo.get_item_by_slug(slug='own-sing-or-energy-throw-similar')
+    user = await users_repo.get_user_by_username(username='djoume')
     for _ in range(100):
-        user = await users_repo.create_user(
-            username=fake.unique.user_name(),
-            email=fake.unique.email(),
-            password=fake.password(),
+        comment = await comments_repo.create_comment_for_item(
+            body=fake.sentence(50),
+            item=item,
+            user=user
         )
-        print(f"Created USer: {user}")
-        for _ in range(1):
-            title = fake.text(50)
-            item = await items_repo.create_item(
-                slug=fake.unique.slug(title),
-                title=title,
-                description=fake.sentence(50),
-                seller=user,
-            )
-            print(f"Created Item: {item}")
-            for _ in range(1):
-                comment = await comments_repo.create_comment_for_item(
-                    body=fake.sentence(50),
-                    item=item,
-                    user=user
-                )
-                print(f"Created Comment: {comment}")
+        print(f"Created Comment: {comment}")
 
 
 if __name__ == '__main__':
