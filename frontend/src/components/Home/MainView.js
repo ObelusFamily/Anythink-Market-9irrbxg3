@@ -85,14 +85,21 @@ const MainView = (props) => {
           <TagFilterTab tag={props.tag} />
         </ul>
       </div>
-
-      <ItemList
-        pager={props.pager}
-        items={props.items}
-        loading={props.loading}
-        itemsCount={props.itemsCount}
-        currentPage={props.currentPage}
-      />
+      { props.searchQuery && props.items.length === 0 ?
+        <div className="container py-4 text-center">
+          <div id="empty">
+            <p>No items found for "<strong>{props.searchQuery}</strong>".</p>
+          </div>
+        </div>
+        :
+        <ItemList
+          pager={props.pager}
+          items={props.items}
+          loading={props.loading}
+          itemsCount={props.itemsCount}
+          currentPage={props.currentPage}
+        />
+      }
     </div>
   );
 };
